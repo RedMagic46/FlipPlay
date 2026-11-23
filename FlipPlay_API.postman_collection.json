@@ -1,0 +1,628 @@
+{
+	"info": {
+		"_postman_id": "8c09a8a7-7d94-4b5c-b172-19e34e5a95cb",
+		"name": "FlipPlay REST API - Modul 4",
+		"description": "Postman Collection resmi untuk pengujian FlipPlay REST API (Laravel 12). Mencakup seluruh skenario CRUD Media, Relasi Eloquent Many-to-Many (Users & Collections), Custom Action Attach/Detach, serta pengujian Happy Path dan Failure Path (422 Unprocessable Entity & 404 Not Found).",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"variable": [
+		{
+			"key": "baseUrl",
+			"value": "http://127.0.0.1:8000/api",
+			"type": "string"
+		}
+	],
+	"item": [
+		{
+			"name": "1. Media CRUD Endpoints",
+			"description": "Kumpulan endpoint CRUD standar untuk entitas Media",
+			"item": [
+				{
+					"name": "1.1 [GET] Menampilkan Seluruh Media (Happy Path)",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/media",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"media"
+							]
+						},
+						"description": "Mengambil seluruh daftar katalog media di FlipPlay."
+					},
+					"response": []
+				},
+				{
+					"name": "1.2 [GET] Pencarian Media berdasarkan Judul (Happy Path)",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/media?search=Inception",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"media"
+							],
+							"query": [
+								{
+									"key": "search",
+									"value": "Inception"
+								}
+							]
+						},
+						"description": "Filter katalog media menggunakan query string 'search'."
+					},
+					"response": []
+				},
+				{
+					"name": "1.3 [GET] Filter Media berdasarkan Genre (Happy Path)",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/media?genre=Sci-Fi",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"media"
+							],
+							"query": [
+								{
+									"key": "genre",
+									"value": "Sci-Fi"
+								}
+							]
+						},
+						"description": "Filter katalog media berdasarkan genre."
+					},
+					"response": []
+				},
+				{
+					"name": "1.4 [POST] Menambahkan Media Baru (Happy Path - 201 Created)",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"type": "text"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"title\": \"Dune: Part Two\",\n    \"type\": \"Movie\",\n    \"genre\": \"Sci-Fi\",\n    \"release_year\": 2024,\n    \"duration\": 166,\n    \"description\": \"Paul Atreides bersekutu dengan Chani dan kaum Fremen untuk membalas dendam terhadap para konspirator yang menghancurkan keluarganya.\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/media",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"media"
+							]
+						},
+						"description": "Menambahkan media baru dengan data valid."
+					},
+					"response": []
+				},
+				{
+					"name": "1.5 [POST] Tambah Media - Judul Kosong (Failure Path - 422)",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"type": "text"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"title\": \"\",\n    \"type\": \"Movie\",\n    \"genre\": \"Action\",\n    \"release_year\": 2024,\n    \"duration\": 120\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/media",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"media"
+							]
+						},
+						"description": "Skenario gagal: Validasi Form Request menolak judul yang kosong dengan status HTTP 422."
+					},
+					"response": []
+				},
+				{
+					"name": "1.6 [POST] Tambah Media - Judul Duplikat (Failure Path - 422)",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"type": "text"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"title\": \"Interstellar\",\n    \"type\": \"Movie\",\n    \"genre\": \"Sci-Fi\",\n    \"release_year\": 2014,\n    \"duration\": 169,\n    \"description\": \"Media dengan judul ini sudah terdaftar sebelumnya.\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/media",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"media"
+							]
+						},
+						"description": "Skenario gagal: Validasi unique pada kolom title menghasilkan error 422 Unprocessable Entity."
+					},
+					"response": []
+				},
+				{
+					"name": "1.7 [GET] Detail Satu Media beserta Pengguna (Happy Path - 200)",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/media/1",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"media",
+								"1"
+							]
+						},
+						"description": "Mengambil detail media ID 1 beserta relasi eager loaded users yang mengoleksinya."
+					},
+					"response": []
+				},
+				{
+					"name": "1.8 [GET] Detail Media - ID Tidak Ditemukan (Failure Path - 404)",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/media/99999",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"media",
+								"99999"
+							]
+						},
+						"description": "Skenario gagal: Meminta media dengan ID yang tidak ada menghasilkan 404 Not Found."
+					},
+					"response": []
+				},
+				{
+					"name": "1.9 [PATCH] Update Media (Happy Path - 200 OK)",
+					"request": {
+						"method": "PATCH",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"type": "text"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"title\": \"Spirited Away (Remastered 4K)\",\n    \"duration\": 126\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/media/5",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"media",
+								"5"
+							]
+						},
+						"description": "Memperbarui data media dengan ID 5."
+					},
+					"response": []
+				},
+				{
+					"name": "1.10 [PATCH] Update Media - Judul Duplikat Media Lain (Failure Path - 422)",
+					"request": {
+						"method": "PATCH",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"type": "text"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"title\": \"Interstellar\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/media/5",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"media",
+								"5"
+							]
+						},
+						"description": "Skenario gagal: Update media ID 5 dengan nama media ID 1 ('Interstellar') ditolak oleh Rule::unique()->ignore()."
+					},
+					"response": []
+				},
+				{
+					"name": "1.11 [DELETE] Hapus Media (Happy Path - 200 OK)",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/media/5",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"media",
+								"5"
+							]
+						},
+						"description": "Menghapus media dari database."
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "2. User Collection & Custom Actions",
+			"description": "Endpoint Custom Action untuk manajemen relasi Many-to-Many antara User dan Media",
+			"item": [
+				{
+					"name": "2.1 [GET] Menampilkan Koleksi Media Pengguna (Happy Path)",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/users/1/collections",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"users",
+								"1",
+								"collections"
+							]
+						},
+						"description": "Menampilkan seluruh koleksi media milik pengguna ID 1 (Naufal) beserta data pivot (notes, added_at)."
+					},
+					"response": []
+				},
+				{
+					"name": "2.2 [POST] Custom Action: Tambah Media ke Koleksi (Happy Path - 201)",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"type": "text"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"media_id\": 4,\n    \"notes\": \"Film Oppenheimer dimasukkan ke daftar tontonan akhir pekan.\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/users/1/collections",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"users",
+								"1",
+								"collections"
+							]
+						},
+						"description": "Menghubungkan media ID 4 (Oppenheimer) ke koleksi pengguna ID 1 (Naufal) via method attach()."
+					},
+					"response": []
+				},
+				{
+					"name": "2.3 [POST] Custom Action: Tambah Media Sama 2x (Failure Path - 422)",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"type": "text"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"media_id\": 1,\n    \"notes\": \"Mencoba menambahkan Interstellar kembali yang sudah ada di koleksi.\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/users/1/collections",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"users",
+								"1",
+								"collections"
+							]
+						},
+						"description": "Skenario gagal: Memasukkan media yang sudah terdaftar di koleksi pengguna menghasilkan error 422 Unprocessable Entity."
+					},
+					"response": []
+				},
+				{
+					"name": "2.4 [POST] Custom Action: Tambah Media ID Tidak Ada (Failure Path - 422)",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"type": "text"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"media_id\": 99999,\n    \"notes\": \"Media fiktif\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/users/1/collections",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"users",
+								"1",
+								"collections"
+							]
+						},
+						"description": "Skenario gagal: Validasi 'exists:media,id' menolak media_id yang tidak ada di database."
+					},
+					"response": []
+				},
+				{
+					"name": "2.5 [DELETE] Custom Action: Hapus Media dari Koleksi (Happy Path - 200)",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/users/1/collections/2",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"users",
+								"1",
+								"collections",
+								"2"
+							]
+						},
+						"description": "Menghapus media ID 2 (Inception) dari koleksi pengguna ID 1 via method detach()."
+					},
+					"response": []
+				},
+				{
+					"name": "2.6 [DELETE] Custom Action: Hapus Media yang Tidak Ada di Koleksi (Failure Path - 404)",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/users/1/collections/3",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"users",
+								"1",
+								"collections",
+								"3"
+							]
+						},
+						"description": "Skenario gagal: Menghapus media ID 3 (The Dark Knight) yang tidak pernah ada di koleksi Naufal menghasilkan error 404."
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "3. User Endpoints",
+			"description": "Endpoint manajemen data pengguna FlipPlay",
+			"item": [
+				{
+					"name": "3.1 [GET] Daftar Seluruh Pengguna (Happy Path)",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/users",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"users"
+							]
+						},
+						"description": "Menampilkan daftar seluruh pengguna beserta jumlah koleksinya."
+					},
+					"response": []
+				},
+				{
+					"name": "3.2 [GET] Detail Pengguna beserta Koleksinya (Happy Path)",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/users/2",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"users",
+								"2"
+							]
+						},
+						"description": "Menampilkan detail pengguna ID 2 (Andi - Platinum VIP) beserta daftar koleksi medianya."
+					},
+					"response": []
+				},
+				{
+					"name": "3.3 [POST] Registrasi Pengguna Baru (Happy Path - 201)",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"type": "text"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\": \"Budi Santoso\",\n    \"email\": \"budi@flipplay.test\",\n    \"membership_type\": \"Premium\",\n    \"password\": \"secret123\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/users",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"users"
+							]
+						},
+						"description": "Mendaftarkan akun pengguna baru ke sistem FlipPlay."
+					},
+					"response": []
+				}
+			]
+		}
+	]
+}

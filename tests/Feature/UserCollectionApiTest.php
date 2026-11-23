@@ -17,9 +17,6 @@ class UserCollectionApiTest extends TestCase
         $this->seed();
     }
 
-    /**
-     * Test melihat daftar koleksi pengguna (Happy Path - 200 OK)
-     */
     public function test_can_get_user_collection_list(): void
     {
         $user = User::where('name', 'Naufal')->firstOrFail();
@@ -59,13 +56,9 @@ class UserCollectionApiTest extends TestCase
             ]);
     }
 
-    /**
-     * Custom Action: Menambahkan media baru ke koleksi pengguna (Happy Path - 201 Created)
-     */
     public function test_can_add_media_to_user_collection_happy_path(): void
     {
         $user = User::where('name', 'Naufal')->firstOrFail();
-        // Oppenheimer belum ada di koleksi Naufal (hanya ada di Andi)
         $media = Media::where('title', 'Oppenheimer')->firstOrFail();
 
         $response = $this->postJson("/api/users/{$user->id}/collections", [
@@ -92,13 +85,9 @@ class UserCollectionApiTest extends TestCase
         ]);
     }
 
-    /**
-     * Custom Action: Uji Skenario Gagal - Menambahkan media yang sama dua kali (Failure Path - 422)
-     */
     public function test_cannot_add_same_media_twice_to_user_collection_failure_path(): void
     {
         $user = User::where('name', 'Naufal')->firstOrFail();
-        // Interstellar sudah ada di koleksi Naufal
         $media = Media::where('title', 'Interstellar')->firstOrFail();
 
         $response = $this->postJson("/api/users/{$user->id}/collections", [
@@ -117,9 +106,6 @@ class UserCollectionApiTest extends TestCase
             ]);
     }
 
-    /**
-     * Custom Action: Validasi media_id tidak valid/tidak ada di database (Failure Path - 422)
-     */
     public function test_cannot_add_non_existent_media_to_user_collection_failure_path(): void
     {
         $user = User::where('name', 'Naufal')->firstOrFail();
@@ -135,13 +121,9 @@ class UserCollectionApiTest extends TestCase
             ]);
     }
 
-    /**
-     * Custom Action: Menghapus media dari koleksi pengguna (Happy Path - 200 OK)
-     */
     public function test_can_remove_media_from_user_collection_happy_path(): void
     {
         $user = User::where('name', 'Naufal')->firstOrFail();
-        // Inception ada di koleksi Naufal
         $media = Media::where('title', 'Inception')->firstOrFail();
 
         $response = $this->deleteJson("/api/users/{$user->id}/collections/{$media->id}");
@@ -158,13 +140,9 @@ class UserCollectionApiTest extends TestCase
         ]);
     }
 
-    /**
-     * Custom Action: Uji Skenario Gagal - Menghapus media yang tidak ada di koleksi (Failure Path - 404)
-     */
     public function test_cannot_remove_media_not_in_user_collection_failure_path(): void
     {
         $user = User::where('name', 'Naufal')->firstOrFail();
-        // Oppenheimer tidak ada di koleksi Naufal
         $media = Media::where('title', 'Oppenheimer')->firstOrFail();
 
         $response = $this->deleteJson("/api/users/{$user->id}/collections/{$media->id}");

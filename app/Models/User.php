@@ -12,11 +12,6 @@ class User extends Authenticatable
 {
     use HasApiTokens, HasFactory, Notifiable;
 
-    /**
-     * The attributes that are mass assignable.
-     *
-     * @var list<string>
-     */
     protected $fillable = [
         'name',
         'email',
@@ -24,21 +19,11 @@ class User extends Authenticatable
         'membership_type',
     ];
 
-    /**
-     * The attributes that should be hidden for serialization.
-     *
-     * @var list<string>
-     */
     protected $hidden = [
         'password',
         'remember_token',
     ];
 
-    /**
-     * Get the attributes that should be cast.
-     *
-     * @return array<string, string>
-     */
     protected function casts(): array
     {
         return [
@@ -47,9 +32,6 @@ class User extends Authenticatable
         ];
     }
 
-    /**
-     * Relasi many-to-many koleksi media milik pengguna
-     */
     public function media(): BelongsToMany
     {
         return $this->belongsToMany(Media::class, 'media_user')

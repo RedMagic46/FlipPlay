@@ -12,9 +12,6 @@ use Illuminate\Http\Request;
 
 class MediaController extends Controller
 {
-    /**
-     * Display a listing of the resource with query filter.
-     */
     public function index(Request $request): JsonResponse
     {
         $filters = $request->only(['search', 'title', 'genre', 'type']);
@@ -32,9 +29,6 @@ class MediaController extends Controller
         ], 200);
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
     public function store(StoreMediaRequest $request): JsonResponse
     {
         $media = Media::create($request->validated());
@@ -46,12 +40,8 @@ class MediaController extends Controller
         ], 201);
     }
 
-    /**
-     * Display the specified resource with eager loaded relations.
-     */
     public function show(Media $media): JsonResponse
     {
-        // Eager load relasi users yang menambahkan media ini ke koleksi pribadinya
         $media->load('users');
         $media->loadCount('users');
 
@@ -62,9 +52,6 @@ class MediaController extends Controller
         ], 200);
     }
 
-    /**
-     * Update the specified resource in storage.
-     */
     public function update(UpdateMediaRequest $request, Media $media): JsonResponse
     {
         $media->update($request->validated());
@@ -76,9 +63,6 @@ class MediaController extends Controller
         ], 200);
     }
 
-    /**
-     * Remove the specified resource from storage.
-     */
     public function destroy(Media $media): JsonResponse
     {
         $title = $media->title;

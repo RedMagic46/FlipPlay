@@ -22,11 +22,6 @@ class Media extends Model
         'description',
     ];
 
-    /**
-     * The attributes that should be cast.
-     *
-     * @return array<string, string>
-     */
     protected function casts(): array
     {
         return [
@@ -35,9 +30,6 @@ class Media extends Model
         ];
     }
 
-    /**
-     * Relasi many-to-many pengguna yang memiliki media ini di koleksinya
-     */
     public function users(): BelongsToMany
     {
         return $this->belongsToMany(User::class, 'media_user')
@@ -45,9 +37,6 @@ class Media extends Model
             ->withTimestamps();
     }
 
-    /**
-     * Scope filter pencarian media berdasarkan keyword search, title, genre, dan type
-     */
     public function scopeFilter(Builder $query, array $filters): Builder
     {
         return $query

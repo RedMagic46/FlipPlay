@@ -2,7 +2,6 @@
 
 use Illuminate\Support\Facades\Route;
 
-// Redirect akses browser dari root dan tanpa prefix /api langsung ke endpoint API yang sesuai
 Route::get('/', function () {
     return response()->json([
         'name' => 'FlipPlay REST API - Laravel 12',

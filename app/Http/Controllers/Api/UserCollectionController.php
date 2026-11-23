@@ -11,9 +11,6 @@ use Illuminate\Http\JsonResponse;
 
 class UserCollectionController extends Controller
 {
-    /**
-     * Menampilkan koleksi media milik seorang pengguna (Index Koleksi Pengguna)
-     */
     public function index(User $user): JsonResponse
     {
         $collections = $user->media()
@@ -34,10 +31,6 @@ class UserCollectionController extends Controller
         ], 200);
     }
 
-    /**
-     * Custom Action: Menambahkan media ke dalam koleksi pengguna (Attach relasi many-to-many)
-     * Termasuk validasi duplikasi koleksi.
-     */
     public function store(StoreUserCollectionRequest $request, User $user): JsonResponse
     {
         $mediaId = (int) $request->validated('media_id');
@@ -45,7 +38,6 @@ class UserCollectionController extends Controller
 
         $media = Media::findOrFail($mediaId);
 
-        // Validasi duplikasi: Cek apakah media sudah ada dalam koleksi pengguna
         if ($user->media()->where('media_id', $mediaId)->exists()) {
             return response()->json([
                 'status' => 'error',
@@ -58,7 +50,6 @@ class UserCollectionController extends Controller
             ], 422);
         }
 
-        // Attach relasi many-to-many beserta data pivot
         $user->media()->attach($mediaId, [
             'notes' => $notes,
         ]);
@@ -75,12 +66,8 @@ class UserCollectionController extends Controller
         ], 201);
     }
 
-    /**
-     * Custom Action: Menghapus media dari koleksi pengguna (Detach relasi many-to-many)
-     */
     public function destroy(User $user, Media $media): JsonResponse
     {
-        // Cek apakah media memang ada di dalam koleksi pengguna
         if (! $user->media()->where('media_id', $media->id)->exists()) {
             return response()->json([
                 'status' => 'error',
@@ -88,7 +75,6 @@ class UserCollectionController extends Controller
             ], 404);
         }
 
-        // Detach relasi
         $user->media()->detach($media->id);
 
         return response()->json([

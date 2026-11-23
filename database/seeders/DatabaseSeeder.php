@@ -9,12 +9,8 @@ use Illuminate\Support\Facades\Hash;
 
 class DatabaseSeeder extends Seeder
 {
-    /**
-     * Seed the application's database.
-     */
     public function run(): void
     {
-        // 1. Seed Pengguna (Sesuai skenario Modul 3: User Regular & Premium)
         $naufal = User::firstOrCreate(
             ['email' => 'naufal@flipplay.test'],
             [
@@ -33,7 +29,6 @@ class DatabaseSeeder extends Seeder
             ]
         );
 
-        // 2. Seed Media (Sesuai katalog Modul 3)
         $media1 = Media::firstOrCreate(
             ['title' => 'Interstellar'],
             [
@@ -89,15 +84,12 @@ class DatabaseSeeder extends Seeder
             ]
         );
 
-        // 3. Seed Koleksi Pengguna (Koleksi Modul 3)
-        // Naufal: Interstellar, Inception, Spirited Away
         $naufal->media()->syncWithoutDetaching([
             $media1->id => ['notes' => 'Masterpiece sci-fi favorit'],
             $media2->id => ['notes' => 'Konsep mimpi berlapis yang brilian'],
             $media5->id => ['notes' => 'Animasi Studio Ghibli terbaik sepanjang masa'],
         ]);
 
-        // Andi: Interstellar, The Dark Knight, Oppenheimer
         $andi->media()->syncWithoutDetaching([
             $media1->id => ['notes' => 'Koleksi tontonan 4K'],
             $media3->id => ['notes' => 'Trilogi Batman Nolan nomor 1'],

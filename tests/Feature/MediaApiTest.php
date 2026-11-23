@@ -14,13 +14,9 @@ class MediaApiTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
-        // Seed initial data
         $this->seed();
     }
 
-    /**
-     * Test mendapatkan daftar seluruh media (Happy Path)
-     */
     public function test_can_get_all_media_list(): void
     {
         $response = $this->getJson('/api/media');
@@ -49,9 +45,6 @@ class MediaApiTest extends TestCase
             ]);
     }
 
-    /**
-     * Test mencari media berdasarkan keyword pencarian (Query filter)
-     */
     public function test_can_filter_media_by_search_keyword(): void
     {
         $response = $this->getJson('/api/media?search=Inception');
@@ -62,9 +55,6 @@ class MediaApiTest extends TestCase
             ]);
     }
 
-    /**
-     * Test filter media berdasarkan genre
-     */
     public function test_can_filter_media_by_genre(): void
     {
         $response = $this->getJson('/api/media?genre=Sci-Fi');
@@ -77,9 +67,6 @@ class MediaApiTest extends TestCase
         }
     }
 
-    /**
-     * Test menambahkan media baru (Happy Path - 201 Created)
-     */
     public function test_can_create_new_media_happy_path(): void
     {
         $payload = [
@@ -110,9 +97,6 @@ class MediaApiTest extends TestCase
         ]);
     }
 
-    /**
-     * Test validasi judul kosong (Failure Path - 422 Unprocessable Entity)
-     */
     public function test_cannot_create_media_with_empty_title_failure_path(): void
     {
         $payload = [
@@ -132,13 +116,10 @@ class MediaApiTest extends TestCase
             ]);
     }
 
-    /**
-     * Test validasi judul duplikat (Failure Path - 422 Unprocessable Entity)
-     */
     public function test_cannot_create_media_with_duplicate_title_failure_path(): void
     {
         $payload = [
-            'title' => 'Interstellar', // Sudah ada di seeder
+            'title' => 'Interstellar',
             'type' => 'Movie',
             'genre' => 'Sci-Fi',
             'release_year' => 2014,
@@ -154,9 +135,6 @@ class MediaApiTest extends TestCase
             ]);
     }
 
-    /**
-     * Test menampilkan detail satu media beserta relasi users yang mengoleksi (Happy Path)
-     */
     public function test_can_show_media_detail_with_users_relation(): void
     {
         $media = Media::where('title', 'Interstellar')->firstOrFail();
@@ -188,15 +166,11 @@ class MediaApiTest extends TestCase
                 ],
             ]);
 
-        // Cek bahwa relasi users ter-load
         $users = $response->json('data.users');
         $this->assertIsArray($users);
         $this->assertNotEmpty($users);
     }
 
-    /**
-     * Test menampilkan media yang tidak ada (Failure Path - 404 Not Found)
-     */
     public function test_show_non_existent_media_returns_404(): void
     {
         $response = $this->getJson('/api/media/99999');
@@ -204,9 +178,6 @@ class MediaApiTest extends TestCase
         $response->assertStatus(404);
     }
 
-    /**
-     * Test memperbarui media (Happy Path - 200 OK)
-     */
     public function test_can_update_media_happy_path(): void
     {
         $media = Media::where('title', 'Spirited Away')->firstOrFail();
@@ -234,24 +205,18 @@ class MediaApiTest extends TestCase
         ]);
     }
 
-    /**
-     * Test memperbarui media dengan judul media lain (Failure Path - 422)
-     */
     public function test_cannot_update_media_with_duplicate_title_failure_path(): void
     {
         $media = Media::where('title', 'Spirited Away')->firstOrFail();
 
         $response = $this->patchJson("/api/media/{$media->id}", [
-            'title' => 'Interstellar', // Judul milik media lain
+            'title' => 'Interstellar',
         ]);
 
         $response->assertStatus(422)
             ->assertJsonValidationErrors(['title']);
     }
 
-    /**
-     * Test menghapus media (Happy Path - 200 OK)
-     */
     public function test_can_delete_media_happy_path(): void
     {
         $media = Media::create([
